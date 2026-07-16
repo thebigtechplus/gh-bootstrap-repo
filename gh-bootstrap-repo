@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# gh extension: gh bootstrap-repo
+# Runs the canonical bootstrap script from thebigtechplus/.github
+set -euo pipefail
+
+SCRIPT_URL="${BTP_BOOTSTRAP_SCRIPT_URL:-https://raw.githubusercontent.com/thebigtechplus/.github/main/scripts/bootstrap-repo.sh}"
+
+if ! command -v gh >/dev/null 2>&1; then
+  echo "error: GitHub CLI (gh) is required. Install: https://cli.github.com/" >&2
+  exit 1
+fi
+
+if ! gh auth status >/dev/null 2>&1; then
+  echo "error: gh is not authenticated. Run: gh auth login" >&2
+  exit 1
+fi
+
+download() {
+  local out="$1"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$SCRIPT_URL" -o "$out"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO "$out" "$SCRIPT_URL"
+  else
+    echo "error: need curl or wget to download bootstrap script" >&2
+    exit 1
+  fi
+}
+
+TMP="$(mktemp "${TMPDIR:-/tmp}/btp-bootstrap.XXXXXX")"
+cleanup() { rm -f "$TMP"; }
+trap cleanup EXIT
+
+download "$TMP"
+chmod +x "$TMP"
+bash "$TMP" "$@"
