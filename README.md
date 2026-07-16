@@ -4,7 +4,14 @@ GitHub CLI extension to bootstrap BigTech+ repositories (labels, `CODEOWNERS`, t
 
 **Requires [GitHub CLI](https://cli.github.com/)** (`gh`) — authenticated with access to the `thebigtechplus` org. All BigTech+ developers use `gh`.
 
-Configures **one repository per run**. It does not apply to all repos automatically.
+Configures **one repository per run**.
+Bootstrap also seeds these files when missing (from org templates):
+
+- `README.md` — product repo starter
+- `AGENTS.md` — AI guidelines (Claude, Codex, Cursor)
+- `CLAUDE.md` — imports `@AGENTS.md` for Claude Code only
+
+ It does not apply to all repos automatically.
 
 ## Install
 
