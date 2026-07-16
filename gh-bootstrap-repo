@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # gh extension: gh bootstrap-repo
-# Runs the canonical bootstrap script from thebigtechplus/.github
+# Downloads the canonical script from thebigtechplus/.github via the GitHub API (requires gh).
 set -euo pipefail
 
-SCRIPT_URL="${BTP_BOOTSTRAP_SCRIPT_URL:-https://raw.githubusercontent.com/thebigtechplus/.github/main/scripts/bootstrap-repo.sh}"
+ORG_REPO="${BTP_BOOTSTRAP_SOURCE_REPO:-thebigtechplus/.github}"
+SCRIPT_PATH="${BTP_BOOTSTRAP_SCRIPT_PATH:-scripts/bootstrap-repo.sh}"
 
 if ! command -v gh >/dev/null 2>&1; then
   echo "error: GitHub CLI (gh) is required. Install: https://cli.github.com/" >&2
@@ -15,15 +16,11 @@ if ! gh auth status >/dev/null 2>&1; then
   exit 1
 fi
 
-download() {
-  local out="$1"
-  if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$SCRIPT_URL" -o "$out"
-  elif command -v wget >/dev/null 2>&1; then
-    wget -qO "$out" "$SCRIPT_URL"
+b64_decode() {
+  if command -v openssl >/dev/null 2>&1; then
+    openssl base64 -d -A 2>/dev/null || openssl base64 -d
   else
-    echo "error: need curl or wget to download bootstrap script" >&2
-    exit 1
+    base64 --decode 2>/dev/null || base64 -d
   fi
 }
 
@@ -31,6 +28,11 @@ TMP="$(mktemp "${TMPDIR:-/tmp}/btp-bootstrap.XXXXXX")"
 cleanup() { rm -f "$TMP"; }
 trap cleanup EXIT
 
-download "$TMP"
+# Prefer GitHub API over raw.githubusercontent.com to avoid CDN staleness
+if ! gh api "repos/${ORG_REPO}/contents/${SCRIPT_PATH}" --jq .content | tr -d '\n' | b64_decode >"$TMP"; then
+  echo "error: failed to download ${SCRIPT_PATH} from ${ORG_REPO}" >&2
+  exit 1
+fi
+
 chmod +x "$TMP"
 bash "$TMP" "$@"

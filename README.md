@@ -2,7 +2,7 @@
 
 GitHub CLI extension to bootstrap BigTech+ repositories (labels, `CODEOWNERS`, teams, merge settings, branch protection).
 
-**Requires [GitHub CLI](https://cli.github.com/)** (`gh`) — authenticated with access to the `thebigtechplus` org.
+**Requires [GitHub CLI](https://cli.github.com/)** (`gh`) — authenticated with access to the `thebigtechplus` org. All BigTech+ developers use `gh`.
 
 Configures **one repository per run**. It does not apply to all repos automatically.
 
@@ -39,11 +39,9 @@ curl -fsSL https://raw.githubusercontent.com/thebigtechplus/.github/main/scripts
 
 ```powershell
 # Windows PowerShell
-irm https://raw.githubusercontent.com/thebigtechplus/.github/main/scripts/bootstrap-repo.ps1 | iex
-# then:
-# (the script does not accept piped args via iex easily — prefer the extension, or:)
-Invoke-RestMethod https://raw.githubusercontent.com/thebigtechplus/.github/main/scripts/bootstrap-repo.ps1 -OutFile $env:TEMP\btp-bootstrap.ps1
-pwsh -File $env:TEMP\btp-bootstrap.ps1 api -Create
+$script = Join-Path $env:TEMP 'btp-bootstrap-repo.ps1'
+Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/thebigtechplus/.github/main/scripts/bootstrap-repo.ps1' -OutFile $script
+pwsh -File $script api -Create
 ```
 
-Canonical scripts live in [thebigtechplus/.github](https://github.com/thebigtechplus/.github).
+Canonical scripts live in [thebigtechplus/.github](https://github.com/thebigtechplus/.github). The extension loads them through the GitHub API so you always get the current default-branch version.
