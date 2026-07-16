@@ -10,6 +10,7 @@ Bootstrap also seeds these files when missing (from org templates):
 - `README.md` — product repo starter
 - `AGENTS.md` — AI guidelines (Claude, Codex, Cursor)
 - `CLAUDE.md` — imports `@AGENTS.md` for Claude Code only
+- `.pre-commit-config.yaml`, `.markdownlint.yaml` — pre-commit hooks (baseline, commitizen, shellcheck, markdownlint, gitleaks)
 
  It does not apply to all repos automatically.
 
