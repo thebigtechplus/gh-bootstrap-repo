@@ -21,8 +21,11 @@ gh extension upgrade bootstrap-repo
 ## Usage
 
 ```bash
-# Create a private repo and configure it
+# Create a private repo and configure it (default)
 gh bootstrap-repo api --create
+
+# Create a public repo
+gh bootstrap-repo oss-demo --create --public
 
 # Configure an existing repo
 gh bootstrap-repo web
